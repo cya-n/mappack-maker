@@ -19,16 +19,17 @@ def download_beatmap_id(file_path, bid_list, label):
 def download_set_id(file_path, setID, label, chunk_size=1024):
     response2 = requests.get(d_url+setID)
     total = int(response2.headers.get('content-length', 0))
-    with open(f"{file_path}/{setID}.osz", "wb") as file, tqdm(desc=f"{file_path}/{setID}.osz",
+    with open(f"{file_path}/{setID}.osz", "wb") as file, tqdm(desc=f"{setID}.osz",
     total=total,
     unit='iB',
     unit_scale=True,
-    unit_divisor=1024,) as bar:
+    unit_divisor=1024,
+    bar_format='{desc} | {percentage:3.0f}%|{bar:15}{r_bar}',) as bar:
         for data in response2.iter_content(chunk_size=chunk_size):
             size = file.write(data)
             bar.update(size)
             label.configure(text=bar)
-    label.destroy()
+    
     print(f"done donwloading {setID}")
     
 

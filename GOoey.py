@@ -15,27 +15,20 @@ customtkinter.set_default_color_theme("green")
 root = customtkinter.CTk()
 root.geometry("1024x768")
 
-
 def donload():
-    global donload_thread
     DOWNLOAD_DEST_PATH = download_path_entry.get("1.0", "end-1c")
     ZIPFILE_PATH = zip_path_entry.get("1.0", "end-1c")
-    bid = entry1.get("1.0",'end-1c').split()
+    bid = set(entry1.get("1.0",'end-1c').split())
+
     prog_bar = customtkinter.CTkLabel(master = frame, text="")
     prog_bar.pack(pady=PAD_Y, padx=10)
 
     download_thread = threading.Thread(target=lambda:download(DOWNLOAD_DEST_PATH, bid, prog_bar, radio_var.get()))
     download_thread.start()
-    
-
-    print("done donlod")
-    donload_thread = threading.Thread(target=donload)
 
 def zip():
     zip_thread = threading.Thread(target=lambda:shutil.make_archive(ZIPFILE_PATH, 'zip', "maps/"))
     zip_thread.start()
-
-zip_thread = threading.Thread(target=zip)
 
 frame = customtkinter.CTkFrame(master=root)
 frame.pack(pady=20, padx=60, fill="both", expand=True)
