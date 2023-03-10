@@ -3,53 +3,55 @@ import time
 import json
 from tqdm import tqdm
 
+
 url = "https://kitsu.moe/api/b/"
 d_url = "https://kitsu.moe/d/"
-# id = input("Enter beatmap id: ").split()
 
 
-def download_beatmap_id(file_path, bid_list, label):
+def download(file_path:str, bid_list:list, progress_bar_label, is_beatmap_id:int):
+    """Takes download file path, beatmap ID list, progress bar label and boolean value as parameters.
+    If is_beatmap_id is 1, then the function used to download maps using beatmap ID is called,
+    else each item in the beatmap ID list is fed to the function used to download maps using
+    beatmap set ID"""
+
+    if is_beatmap_id:
+        download_beatmap_id(file_path, bid_list, progress_bar_label)
+    else:
+        for bid in bid_list:
+            download_set_id(file_path, bid, progress_bar_label)
+    progress_bar_label.destroy()
+    
+
+def download_beatmap_id(file_path, bid_list, progress_bar_label):
+    """Uses kitsune's beatmap info api to get the beatmap set ID using the beatmap IDs in the beatmap 
+    ID list using for loop. This beatmap set ID is fed to the beatmap set ID download function."""
     count = 0
     for _ in bid_list:
         response = requests.get(url+bid_list[count])
         setID = str(json.loads(response.content)["ParentSetID"])
-        download_set_id(file_path, setID, label)
+        download_set_id(file_path, setID, progress_bar_label)
         count+=1
+    
 
 def download_set_id(file_path, setID, label, chunk_size=1024):
+    """Uses kitsune's beatmap set downloader api to download .osz file and store it in the download file
+    . Also implements the progress bar using tqdm."""
     response2 = requests.get(d_url+setID)
     total = int(response2.headers.get('content-length', 0))
-    with open(f"{file_path}/{setID}.osz", "wb") as file, tqdm(desc=f"{setID}.osz",
-    total=total,
-    unit='iB',
-    unit_scale=True,
-    unit_divisor=1024,
-    bar_format='{desc} | {percentage:3.0f}%|{bar:15}{r_bar}',) as bar:
+    with open (
+        f"{file_path}/{setID}.osz", "wb") as file, tqdm(desc=f"{setID}.osz", 
+        total=total,
+        unit='iB',
+        unit_scale=True,
+        unit_divisor=1024,
+        bar_format='{desc} | {percentage:3.0f}%|{bar:15}{r_bar}',
+    ) as bar:
         for data in response2.iter_content(chunk_size=chunk_size):
             size = file.write(data)
             bar.update(size)
             label.configure(text=bar)
     
     print(f"done donwloading {setID}")
-    
-
-def download(file_path, bid_list, label, is_beatmap_id):
-    if is_beatmap_id:
-        download_beatmap_id(file_path, bid_list, label)
-    else:
-        for bid in bid_list:
-            download_set_id(file_path, bid, label)
-    
 
 
-    
-
-# def download(bid):
-#     count = 0
-#     for _ in bid:
-#         response = requests.get(url+bid[count])
-#         open(f"maps/{bid[count]}.osz", "wb").write(response.content)
-#         print(f"done donloading {bid[count]}")
-#         time.sleep(5)
-#         count +=1
 
