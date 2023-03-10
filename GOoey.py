@@ -23,10 +23,10 @@ def donload():
    # rameez.pack(pady=12,padx=10)
     global donload_thread
     bid = entry1.get("1.0",'end-1c').split()
+    prog_bar = customtkinter.CTkLabel(master = frame, text="")
+    prog_bar.pack(pady=12, padx=10)
 
-    prog = customtkinter.CTkProgressBar(master=frame)
-    prog.pack(pady=12, padx=10)
-    download_thread = threading.Thread(target=lambda:download(DOWNLOAD_DEST_PATH, bid))
+    download_thread = threading.Thread(target=lambda:download(DOWNLOAD_DEST_PATH, bid, prog_bar))
     download_thread.start()
     
 

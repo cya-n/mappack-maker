@@ -7,7 +7,7 @@ url = "https://kitsu.moe/api/b/"
 d_url = "https://kitsu.moe/d/"
 # id = input("Enter beatmap id: ").split()
 
-def download(file_path, bid, chunk_size=1024):
+def download(file_path, bid, label, chunk_size=1024):
     count = 0
     for _ in bid:
         response = requests.get(url+bid[count])
@@ -23,8 +23,8 @@ def download(file_path, bid, chunk_size=1024):
             for data in response2.iter_content(chunk_size=chunk_size):
                 size = file.write(data)
                 bar.update(size)
-                print(bar)
-                
+                label.configure(text=bar)
+        label.destroy()
         print(f"done donwloading {setID}")
         count+=1
 
