@@ -16,6 +16,10 @@ cd mappack-maker
 pip install requests
 pip install customtkinter
 ```
+Running the file
+```
+open mappack-maker.bat to run the file and it should open the window as shown down below:
+```
 ### Example
 ![image](https://user-images.githubusercontent.com/66593133/224320929-7355ac80-ed49-46b7-bfb1-2d139651bb92.png)
 ```
