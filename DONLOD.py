@@ -5,15 +5,16 @@ url = "https://kitsu.moe/api/b/"
 d_url = "https://kitsu.moe/d/"
 # id = input("Enter beatmap id: ").split()
 
-def download(bid):
+def download(file_path, bid):
     count = 0
     for _ in bid:
         response = requests.get(url+bid[count])
         setID = str(json.loads(response.content)["ParentSetID"])
         response2 = requests.get(d_url+setID)
-        open(f"maps/{setID}.osz", "wb").write(response2.content)
+        open(f"{file_path}/{setID}.osz", "wb").write(response2.content)
         print(f"done donwloading {setID}")
         count+=1
+
     
 
 # def download(bid):
@@ -25,4 +26,3 @@ def download(bid):
 #         time.sleep(5)
 #         count +=1
 
-download(["3968104"])
