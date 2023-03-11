@@ -1,9 +1,7 @@
 import customtkinter
-import tkinter
 from DONLOD import *
 import shutil
 import threading
-from PIL import Image
 
 #COMMON USE VARIABLES
 DOWNLOAD_DEST_PATH = "maps/"
@@ -17,7 +15,7 @@ customtkinter.set_default_color_theme("green")
 root = customtkinter.CTk()
 root.geometry("1024x768")
 root.title("beatmap-downloader")
-root.iconbitmap("mappack_maker.ico")
+
 
 def initialize_download():
     """Called by the download button. Gets beatmap IDs, download destination path and zipfile path from the entries and calls the download function"""
@@ -25,11 +23,15 @@ def initialize_download():
     DOWNLOAD_DEST_PATH = download_path_entry.get("1.0", "end-1c")
     ZIPFILE_PATH = zip_path_entry.get("1.0", "end-1c")
     bid = list(set(bid_entry.get("1.0",'end-1c').split()))
-    prog_bar = customtkinter.CTkLabel(master = frame, text="")
+    prog_bar = customtkinter.CTkProgressBar(master = frame)
+    prog_bar.set(0)
     prog_bar.pack(pady=PAD_Y, padx=10)
 
+    maps_downloaded_label = customtkinter.CTkLabel(master=frame, text="Maps downloaded: ")
+    maps_downloaded_label.pack(pady=PAD_Y, padx=10)
+
     # Initialises download thread to prevent freezing the window during download
-    download_thread = threading.Thread(target=lambda:download(DOWNLOAD_DEST_PATH, bid, prog_bar, radio_var.get()))
+    download_thread = threading.Thread(target=lambda:download(DOWNLOAD_DEST_PATH, bid, prog_bar, maps_downloaded_label, radio_var.get()))
     download_thread.start()
 
 def zip_download_file():
