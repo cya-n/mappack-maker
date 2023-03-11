@@ -16,7 +16,8 @@ customtkinter.set_default_color_theme("green")
 
 root = customtkinter.CTk()
 root.geometry("1024x768")
-
+root.title("beatmap-downloader")
+root.iconbitmap("mappack_maker.ico")
 
 def initialize_download():
     """Called by the download button. Gets beatmap IDs, download destination path and zipfile path from the entries and calls the download function"""
