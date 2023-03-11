@@ -22,6 +22,7 @@ class Gui:
         self.frame = customtkinter.CTkFrame(master=self.root)
         self.frame.pack(pady=20, padx=60, fill="both", expand=True)
 
+
         # Beatmap ID label and entry
         self.enter_bid_label = customtkinter.CTkLabel(master=self.frame, text="Enter beatmap IDs:")
         self.enter_bid_label.pack(pady=PAD_Y, padx=10)
@@ -46,29 +47,18 @@ class Gui:
         self.zip_path_entry.insert("0.0", ZIPFILE_PATH)
         self.zip_path_entry.pack(pady=PAD_Y, padx=10)
 
-        # Download button, calls the initialize download function
-        self.download_button = customtkinter.CTkButton(master=self.frame, text="DONLOAD", command=self.initialize_download)
-        self.download_button.pack(pady=PAD_Y, padx=10)
-
         # Initialise downloader object
         self.downloader = Downloader(self.frame)
+
+        # Download button, calls the initialize download function
+        self.download_button = customtkinter.CTkButton(master=self.frame, text="DONLOAD", command=lambda:self.downloader.initialize_download(self))
+        self.download_button.pack(pady=PAD_Y, padx=10)
         
         # Zip button, zips the download file and stores it in specified location
         self.zip_button = customtkinter.CTkButton(master=self.frame, text="Create .zip", command=self.zip_download_file)
         self.zip_button.pack(pady=PAD_Y, padx=10)
 
         self.root.mainloop()
-
-    def initialize_download(self):
-        """Called by the download button. Gets beatmap IDs, download destination path and zipfile path from the entries and calls the download function"""
-        # Get values from entries
-        DOWNLOAD_DEST_PATH = self.download_path_entry.get("1.0", "end-1c")
-        ZIPFILE_PATH = self.zip_path_entry.get("1.0", "end-1c")
-        bid = list(set(self.bid_entry.get("1.0",'end-1c').split()))
-
-        # Initialises download thread to prevent freezing the window during download
-        download_thread = threading.Thread(target=lambda:self.downloader.download(DOWNLOAD_DEST_PATH, bid))
-        download_thread.start()
 
     def zip_download_file(self):
         """Called by the zip button. Zips the download destination file at the zipfile path"""

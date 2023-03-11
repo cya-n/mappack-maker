@@ -1,6 +1,7 @@
 import customtkinter
 import json
 import requests
+import threading
 import time
 from tqdm import tqdm
 
@@ -23,12 +24,28 @@ class Downloader:
         self.beatmapid_button.pack(padx=20, pady=PAD_Y)
         self.setid_button.pack(padx=20, pady=PAD_Y)
 
+        self.download_in_progress = False
+
+    def initialize_download(self, gui):
+        """Called by the download button. Gets beatmap IDs, download destination path and zipfile path from the entries and calls the download function"""
+        # if the function is currently executing, the download wont start
+        if self.download_in_progress:
+            return
+        self.download_in_progress = True
+        # Get values from entries
+        DOWNLOAD_DEST_PATH = gui.download_path_entry.get("1.0", "end-1c")
+        ZIPFILE_PATH = gui.zip_path_entry.get("1.0", "end-1c")
+        bid = list(set(gui.bid_entry.get("1.0",'end-1c').split()))
+
+        # Initialises download thread to prevent freezing the window during download
+        download_thread = threading.Thread(target=lambda:self.download(DOWNLOAD_DEST_PATH, bid))
+        download_thread.start()
+
     def download(self, file_path:str, bid_list:list):
         """Takes download file path, beatmap ID list, progress bar label and boolean value as parameters.
         If is_beatmap_id is 1, then the function used to download maps using beatmap ID is called,
         else each item in the beatmap ID list is fed to the function used to download maps using
         beatmap set ID"""
-
         # Creates progress bar and label to show number of maps downloaded
         self.progress_bar = customtkinter.CTkProgressBar(master = self.frame)
         self.progress_bar.set(0)
@@ -47,11 +64,13 @@ class Downloader:
                 self.maps_downloaded_label.configure(text=f"Maps downloaded: {count}/{no_of_maps}")
                 self.download_set_id(file_path, bid)
                 count += 1
+
         self.maps_downloaded_label.destroy()
         self.progress_bar.destroy()
-        
 
-    def download_beatmap_id(self, file_path, bid_list):
+        self.download_in_progress = False
+
+    def download_beatmap_id(self, file_path:str, bid_list:list):
         """Uses kitsune's beatmap info api to get the beatmap set ID using the beatmap IDs in the beatmap 
         ID list using for loop. This beatmap set ID is fed to the beatmap set ID download function."""
         count = 0
@@ -62,9 +81,8 @@ class Downloader:
             setID = str(json.loads(response.content)["ParentSetID"])
             self.download_set_id(file_path, setID)
             count+=1
-        
 
-    def download_set_id(self, file_path, setID, chunk_size=1024):
+    def download_set_id(self, file_path:str, setID:int, chunk_size=1024):
         """Uses kitsune's beatmap set downloader api to download .osz file and store it in the download file
         . Also implements the progress bar using tqdm."""
         map_not_found = True
