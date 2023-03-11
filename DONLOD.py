@@ -4,8 +4,8 @@ import json
 from tqdm import tqdm
 
 
+d_url_list = ["https://kitsu.moe/d/", "https://api.nerinyan.moe/d/"]
 url = "https://kitsu.moe/api/b/"
-d_url = "https://kitsu.moe/d/"
 
 
 def download(file_path:str, bid_list:list, progress_bar, maps_downloaded_label, is_beatmap_id:int):
@@ -18,6 +18,7 @@ def download(file_path:str, bid_list:list, progress_bar, maps_downloaded_label, 
         download_beatmap_id(file_path, bid_list, progress_bar, maps_downloaded_label)
     else:
         count = 0
+        no_of_maps = len(bid_list)
         for bid in bid_list:
             maps_downloaded_label.configure(text=f"Maps downloaded: {count}/{no_of_maps}")
             download_set_id(file_path, bid, progress_bar, maps_downloaded_label)
@@ -42,7 +43,18 @@ def download_beatmap_id(file_path, bid_list, progress_bar, maps_downloaded_label
 def download_set_id(file_path, setID, progress_bar, maps_downloaded_label, chunk_size=1024):
     """Uses kitsune's beatmap set downloader api to download .osz file and store it in the download file
     . Also implements the progress bar using tqdm."""
-    response2 = requests.get(d_url+setID)
+    map_found = False
+    for d_url in d_url_list:
+        response2 = requests.get(d_url+setID)
+        if response2.status_code == 200:
+            map_found = True
+            break
+
+    if not map_found:
+        maps_downloaded_label.configure(text=f"Map {setID} does not exist, try changing ID type.")
+        time.sleep(2)
+        return
+
     total = int(response2.headers.get('content-length', 0))
     print(total)
     with open (
@@ -58,7 +70,7 @@ def download_set_id(file_path, setID, progress_bar, maps_downloaded_label, chunk
         for data in response2.iter_content(chunk_size=chunk_size):
             size = file.write(data)
             bar.update(size)
-            # Updates percentage bar at every 0.01 interval to increase speed
+            # Updates percentage bar at every 0.01 interval
             current_percentage = "{:.2f}".format(bar.n/total)
             if prev_percentage != current_percentage:
                 progress_bar.set((bar.n/total))
