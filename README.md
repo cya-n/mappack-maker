@@ -15,6 +15,7 @@ Install dependencies
 cd mappack-maker
 pip install requests
 pip install customtkinter
+pip install tqdm
 ```
 Running the file
 ```
