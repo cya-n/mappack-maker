@@ -2,6 +2,11 @@
 Relatively easy to use mappack maker, it takes in Beatmap IDs and downloads the maps via https://kitsu.moe/ and zip the mappack
 
 ## Getting Started
+
+Get the newest release from [releases!](https://github.com/CyanOwO/mappack-maker/releases)
+
+**Note: if you want to run the program without downloading the exe, please follow the steps mentioned below**
+
 ### Prerequisites
 Python 3
 ### Installing
