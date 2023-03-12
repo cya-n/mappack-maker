@@ -4,6 +4,7 @@ import requests
 import threading
 import time
 from tqdm import tqdm
+import os
 
 #COMMON USE VARIABLES
 DOWNLOAD_DEST_PATH = "maps/"
@@ -34,6 +35,8 @@ class Downloader:
         self.download_in_progress = True
         # Get values from entries
         DOWNLOAD_DEST_PATH = gui.download_path_entry.get("1.0", "end-1c")
+        if not os.path.exists(DOWNLOAD_DEST_PATH):
+            os.makedirs(DOWNLOAD_DEST_PATH)
         ZIPFILE_PATH = gui.zip_path_entry.get("1.0", "end-1c")
         bid = list(set(gui.bid_entry.get("1.0",'end-1c').split()))
 
