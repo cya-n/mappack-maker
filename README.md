@@ -1,5 +1,5 @@
 # mappack-maker
-Relatively easy to use mappack maker, it takes in Beatmap IDs and downloads the maps via https://kitsu.moe/ and zips the mappack
+Relatively easy to use mappack maker, it takes in Beatmap IDs and downloads the maps via https://kitsu.moe/ and https://nerinyan.moe/, and zips the mappack
 
 ## Getting Started
 
@@ -24,7 +24,7 @@ pip install tqdm
 ```
 Running the file
 ```
-open mappack-maker.bat to run the file and it should open the window as shown down below:
+py main.py
 ```
 ### Example
 ![image](https://user-images.githubusercontent.com/66593133/224495015-7ddac455-cc3c-4788-9a23-51b0d7eb3d54.png)
