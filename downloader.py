@@ -5,6 +5,7 @@ import threading
 import time
 from tqdm import tqdm
 import os
+import re
 
 #COMMON USE VARIABLES
 DOWNLOAD_DEST_PATH = "maps/"
@@ -26,6 +27,44 @@ class Downloader:
         self.setid_button.pack(padx=20, pady=PAD_Y)
 
         self.download_in_progress = False
+
+    def get_beatmap_set_ids_from_text(text):
+        # Regex to find set ID from beatmapset link
+        regex_beatmapset_id = re.compile("(?<=beatmapsets\/)([0-9]*)", re.MULTILINE) # matches format /beatmapsets/xxxxx#xxxxx (setID#difficultyID) or /beatmapsets/xxxxx (setID)
+       
+        # Regex to find difficultyID links
+        regex_difficulty_id_link = re.compile("(.*\/(b|beatmaps)\/.*)", re.MULTILINE) # matches format /b/xxxxx or /beatmaps/xxxxx (difficulty id)
+
+        # Regex to find difficultyIDs
+        regex_difficulty_id = re.compile("^[0-9]+$", re.MULTILINE) # matches format xxxxx (difficulty id)
+        
+        # Add all setIDs from links
+        set_ids = []
+        for i in re.findall(regex_beatmapset_id, text):
+            set_ids.append(i)
+
+        # Get setIDs from difficultyID links
+        for match in re.findall(regex_difficulty_id_link, text):
+            url = match[0]
+            try:
+                r = requests.head(url, allow_redirects=True, timeout=10)
+
+                set_ids.append(re.findall(regex_beatmapset_id, r.url)[0])
+            except:
+                print("{} is not a valid beatmap URL!".format(url))
+
+        # Get setIDs from difficultyIDs
+        for difficulty_id in re.findall(regex_difficulty_id, text):
+            prefix = "https://osu.ppy.sh/b/"
+            url = prefix + difficulty_id
+
+            try:
+                r = requests.head(url, allow_redirects=True, timeout=10)
+                set_ids.append(re.findall(regex_beatmapset_id, r.url)[0])
+            except:
+                print("{} is not a valid beatmap URL!".format(url))
+
+        return set_ids
 
     def initialize_download(self, gui):
         """Called by the download button. Gets beatmap IDs, download destination path and zipfile path from the entries and calls the download function"""
